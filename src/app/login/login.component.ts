@@ -17,4 +17,7 @@ export class LoginComponent {
     debugger
     this.googleAuthService.loginWithGoogle();
   }
+  handleResponse() {
+    this.googleAuthService.handleGoogleResponse();
+  }
 }
