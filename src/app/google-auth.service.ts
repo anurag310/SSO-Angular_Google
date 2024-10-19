@@ -10,43 +10,80 @@ import { Router } from '@angular/router';
 export class GoogleAuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
+  // Google login
   loginWithGoogle() {
-    debugger
-    // Open a new window for Google authentication
     const authWindow = window.open(
-      'https://localhost:7127/api/Account/login', // This should be your backend login URL
+      'https://localhost:7127/api/Account/login', // Backend Google login URL
       '_blank',
       'width=500,height=600'
     );
 
-    // Listen for messages from the authentication window
+    this.listenForAuthResponse();
+  }
+
+  // Facebook login
+  loginWithFacebook() {
+    const authWindow = window.open(
+      'https://localhost:7127/api/Account/login/facebook', // Backend Facebook login URL
+      '_blank',
+      'width=500,height=600'
+    );
+
+    this.listenForAuthResponse();
+  }
+
+  // Common function to listen for messages from the authentication windows
+  listenForAuthResponse() {
     window.addEventListener('message', (event) => {
-      debugger
+      // You can dynamically check the origin in production
       if (event.origin !== 'https://localhost:7127') {
         return;
       }
 
-      // Handle the response from Google
       const user = event.data;
       if (user) {
         console.log('User authenticated:', user);
-        // Do further processing here, like setting up user session or making API calls
+
+        // Store token in localStorage
+        localStorage.setItem('authToken', user.Token);
+        console.log('Token stored successfully:', user.Token);
+
+        // Optionally navigate to a different page after successful login
+        this.router.navigate(['/home']);
       }
     });
   }
+
+  // (Optional) Call backend to handle the Google response
   handleGoogleResponse() {
-    // Call the Google response endpoint to retrieve the token
-    this.http.get<any>('/api/account/GoogleResponse').subscribe(
+    this.http.get<any>('/api/Account/GoogleResponse').subscribe(
       (response) => {
         // Store token in localStorage
         localStorage.setItem('authToken', response.Token);
-        console.log('Token stored successfully:', response.Token);
+        console.log('Google Token stored successfully:', response.Token);
 
-        // Optionally, navigate the user to a different page
+        // Optionally navigate to another page
         this.router.navigate(['/home']);
       },
       (error) => {
         console.error('Error during Google authentication:', error);
+      }
+    );
+  }
+
+  // (Optional) Call backend to handle the Facebook response
+  handleFacebookResponse() {
+    this.http.get<any>('/api/Account/FacebookResponse').subscribe(
+      (response) => {
+        // Store token in localStorage
+        localStorage.setItem('authToken', response.Token);
+        console.log('Facebook Token stored successfully:', response.Token);
+
+        // Optionally navigate to another page
+        this.router.navigate(['/home']);
+      },
+      (error) => {
+        console.error('Error during Facebook authentication:', error);
       }
     );
   }

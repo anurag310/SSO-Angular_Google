@@ -7,6 +7,7 @@ import { GoogleAuthService } from '../google-auth.service';
   selector: 'app-login',
   template: `
     <button (click)="login()">Login with Google</button>
+    <button (click)="loginFacebook()">Login with facebook</button>
   `,
   styles: [],
 })
@@ -19,5 +20,12 @@ export class LoginComponent {
   }
   handleResponse() {
     this.googleAuthService.handleGoogleResponse();
+  }
+  loginFacebook() {
+    debugger
+    this.googleAuthService.loginWithFacebook();
+  }
+  handlefacebookResponse() {
+    this.googleAuthService.handleFacebookResponse();
   }
 }
